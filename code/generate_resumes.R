@@ -25,7 +25,7 @@ load_api_key_to_env <- function(path) {
 #' 
 #' This function creates a custom prompt for the GPT-4 model based on the details provided in the input row.
 compose_prompt <- function(row) {
-  overall_prompt <- "Please compose a sample resume using real years and institutions for the following person. Please go into a lot of detail and make this longer than you would think to, particularly the descriptions of what they're doing at their jobs."
+  overall_prompt <- "Please compose a sample resume using real years and institutions for the following person. Please go into a lot of detail and make this longer than you would think to, particularly the descriptions of what they're doing at their jobs. "
   prompt <- paste0(overall_prompt, row[['Name']], " currently has the job title of ", row[['Current.Job']], ". They have an undergraduate degree in ", row[['Academic.Background']], ". This is a description of them: ", row[['Descriptions']])
   return(prompt)
 }
@@ -53,11 +53,12 @@ get_response <- function(prompt, engine) {
       }
       
     }, error = function(e) {
-      attempts <- attempts + 1
+      attempts <<- attempts + 1
       print(paste0("Error processing prompt. Engine: ", engine, ", Prompt: ", prompt, ", Error: ", substr(e$message, 1, 100)))
       Sys.sleep(10)
     })
   }
+  return('')  # give up after MAX_RETRIES so map_chr gets a string, not NULL
 }
 
 #' Process Responses from OpenAI GPT-4 model
